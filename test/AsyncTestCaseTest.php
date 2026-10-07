@@ -5,6 +5,8 @@ namespace Amp\PHPUnit;
 use Amp\DeferredFuture;
 use Amp\Future;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 use Revolt\EventLoop;
 use function Amp\async;
 use function Amp\delay;
@@ -66,7 +68,7 @@ class AsyncTestCaseTest extends AsyncTestCase
         };
 
         $this->expectException(TestException::class);
-        $this->expectExceptionMessage('threw the error');
+        $this->expectExceptionMessageIsOrContains('threw the error');
 
         return async($throwException);
     }
@@ -80,16 +82,14 @@ class AsyncTestCaseTest extends AsyncTestCase
         });
     }
 
-    public function provideArguments(): array
+    public static function provideArguments(): array
     {
         return [
             ['foo', 42, true],
         ];
     }
 
-    /**
-     * @dataProvider provideArguments
-     */
+    #[DataProvider('provideArguments')]
     public function testArgumentSupport(string $foo, int $bar, bool $baz): void
     {
         self::assertSame('foo', $foo);
@@ -97,10 +97,8 @@ class AsyncTestCaseTest extends AsyncTestCase
         self::assertTrue($baz);
     }
 
-    /**
-     * @depends testReturningFuture
-     */
-    public function testReturnValueFromDependentTest(string $value = null): void
+    #[Depends('testReturningFuture')]
+    public function testReturnValueFromDependentTest(?string $value = null): void
     {
         self::assertSame('value', $value);
     }
@@ -128,7 +126,7 @@ class AsyncTestCaseTest extends AsyncTestCase
         $this->setTimeout(0.1);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Expected test to complete before 0.100s time limit');
+        $this->expectExceptionMessageIsOrContains('Expected test to complete before 0.100s time limit');
 
         $deferred = new DeferredFuture;
 
@@ -142,7 +140,7 @@ class AsyncTestCaseTest extends AsyncTestCase
         $this->setTimeout(0.1);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Expected test to complete before 0.100s time limit');
+        $this->expectExceptionMessageIsOrContains('Expected test to complete before 0.100s time limit');
 
         delay(0.2);
     }

@@ -13,7 +13,7 @@ This package can be installed as a [Composer](https://getcomposer.org/) dependen
 composer require --dev amphp/phpunit-util
 ```
 
-The package requires PHP 8.1 or later.
+The package requires PHP 8.4 or later and PHPUnit 13.
 
 ## Usage
 
